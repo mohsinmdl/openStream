@@ -52,7 +52,7 @@
     ];
     var i = 0;
 
-    var margin = {top: -5, right: -5, bottom: -5, left: -5},
+    var margin = {top: 60, right: 20, bottom: 20, left: 40},
         width = 960 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
 
@@ -71,7 +71,8 @@
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.right + ")")
-        .call(zoom);
+        .call(zoom)
+        .on("dblclick.zoom", null);
 
     var rect = svg.append("rect")
         .attr("width", width)
@@ -110,7 +111,7 @@
         var diagonal = d3.svg.diagonal()
             .projection(function(d) { return [d.y, d.x]; });
 
-        var svg = container.append("g")
+        var svg2 = container.append("g")
             .attr("width", width + margin.right + margin.left)
             .attr("height", height + margin.top + margin.bottom)
             .attr("style","cursor: pointer;")
@@ -123,20 +124,19 @@
         nodes.forEach(function(d) { d.y = d.depth * 180; });
 
         // Declare the nodesâ€¦
-        var node = svg.selectAll("g.node")
+        var node = svg2.selectAll("g.node")
             .data(nodes, function(d) { return d.id || (d.id = ++i); });
 
         // Enter the nodes.
         var nodeEnter = node.enter().append("g")
             .attr("class", "node")
             .attr("transform", function(d) {
-                return "translate(" + d.y + "," + d.x + ")"; });
+                return "translate(" + d.y + "," + d.x + ")"; })
+            .on('dblclick',onClick);
 
         nodeEnter.append("circle")
             .attr("r", 10)
-            .attr("fill", d =>
-                d.children ? "#4e1b1b" : "#555"
-            );
+            .attr("fill", d => d.children ? "#4e1b1b" : "#555");
 
         nodeEnter.append("text")
             .attr("x", function(d) {
@@ -149,7 +149,7 @@
         ;
 
         // Declare the linksâ€¦
-        var link = svg.selectAll("path.link")
+        var link = svg2.selectAll("path.link")
             .data(links, function(d) { return d.target.id; });
 
         // Enter the links.
@@ -157,5 +157,19 @@
             .attr("class", "link")
             .attr("d", diagonal);
         return tree;
+    }
+    function onClick(node) {
+        searchPath(node);
+
+    }
+    function searchPath(node) {
+        if(node )
+        { console.log(node);
+            searchPath(node.parent);
+        }
+        else {
+            return;
+
+        }
     }
 </script>
